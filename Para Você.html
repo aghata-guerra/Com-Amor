@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Você ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: black;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Limpa e reinicia o fundo preto se a tela mudar de tamanho
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        resize();
+
+        // Configurações do texto
+        ctx.font = "bold 8px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Variáveis para controlar os múltiplos corações espalhados
+        let currentHeart = {
+            centerX: Math.random() * canvas.width,
+            centerY: Math.random() * canvas.height,
+            maxScale: Math.random() * 8 + 4, // Tamanhos variados (entre 4 e 12)
+            scale: 4,
+            i: 0
+        };
+
+        function draw() {
+            // Desenha um ponto do coração atual
+            ctx.fillStyle = "red";
+            
+            const angle = currentHeart.i * (Math.PI * 2) / 120;
+            const x = 16 * Math.pow(Math.sin(angle), 3) * currentHeart.scale;
+            const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * currentHeart.scale;
+
+            // Desenha a frase baseada no centro DO CORAÇÃO ATUAL
+            ctx.fillText("Eu te amo", currentHeart.centerX + x, currentHeart.centerY + y);
+
+            currentHeart.i++;
+
+            // Se terminou uma volta do coração, aumenta o tamanho dele (escala)
+            if (currentHeart.i >= 120) {
+                currentHeart.i = 0;
+                currentHeart.scale++;
+            }
+
+            // Se o coração atual atingiu o tamanho máximo dele, cria um NOVO coração em outro lugar aleatório da tela
+            if (currentHeart.scale > currentHeart.maxScale) {
+                currentHeart = {
+                    centerX: Math.random() * canvas.width,
+                    centerY: Math.random() * canvas.height,
+                    maxScale: Math.random() * 8 + 4, 
+                    scale: 4,
+                    i: 0
+                };
+            }
+
+            // Continua a animação infinitamente, preenchendo a tela inteira aos poucos
+            requestAnimationFrame(draw);
+        }
+
+        // Inicia o preenchimento
+        draw();
+
+        window.addEventListener('resize', () => {
+            resize();
+            ctx.font = "bold 8px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+        });
+    </script>
+</body>
+</html>
