@@ -35,65 +35,58 @@
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Limpa e reinicia o fundo preto se a tela mudar de tamanho
+            // Mantém o fundo preto
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         resize();
 
         // Configurações do texto
+        ctx.fillStyle = "red";
         ctx.font = "bold 8px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        // Variáveis para controlar os múltiplos corações espalhados
-        let currentHeart = {
-            centerX: Math.random() * canvas.width,
-            centerY: Math.random() * canvas.height,
-            maxScale: Math.random() * 8 + 4, // Tamanhos variados (entre 4 e 12)
-            scale: 4,
-            i: 0
-        };
+        // Começa na escala 11 (igual ao seu original)
+        let scale = 11;
+        let i = 0;
 
         function draw() {
-            // Desenha um ponto do coração atual
-            ctx.fillStyle = "red";
-            
-            const angle = currentHeart.i * (Math.PI * 2) / 120;
-            const x = 16 * Math.pow(Math.sin(angle), 3) * currentHeart.scale;
-            const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * currentHeart.scale;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
 
-            // Desenha a frase baseada no centro DO CORAÇÃO ATUAL
-            ctx.fillText("Eu te amo", currentHeart.centerX + x, currentHeart.centerY + y);
-
-            currentHeart.i++;
-
-            // Se terminou uma volta do coração, aumenta o tamanho dele (escala)
-            if (currentHeart.i >= 120) {
-                currentHeart.i = 0;
-                currentHeart.scale++;
+            // Se completou a volta de 120 pontos da camada atual, vai para a próxima escala maior
+            if (i >= 120) {
+                i = 0;
+                scale += 0.5; // Aumenta de 0.5 em 0.5 para as camadas ficarem bem juntinhas e preenchidas
             }
 
-            // Se o coração atual atingiu o tamanho máximo dele, cria um NOVO coração em outro lugar aleatório da tela
-            if (currentHeart.scale > currentHeart.maxScale) {
-                currentHeart = {
-                    centerX: Math.random() * canvas.width,
-                    centerY: Math.random() * canvas.height,
-                    maxScale: Math.random() * 8 + 4, 
-                    scale: 4,
-                    i: 0
-                };
+            // O código NÃO para mais na escala 16. Ele calcula a diagonal da tela para saber quando cobriu tudo
+            const maxScaleNeeded = Math.max(canvas.width, canvas.height) / 10;
+            if (scale > maxScaleNeeded) {
+                return; // Só para quando realmente preencher a tela inteira de ponta a ponta
             }
 
-            // Continua a animação infinitamente, preenchendo a tela inteira aos poucos
+            // Equação matemática original do seu coração
+            const angle = i * (Math.PI * 2) / 120;
+            const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
+            const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
+
+            // Desenha a frase na posição calculada (sempre baseada no centro da tela)
+            ctx.fillText("Eu te amo", centerX + x, centerY + y);
+
+            i++;
+
+            // Mantém o efeito do tempo passando ao desenhar letra por letra
             requestAnimationFrame(draw);
         }
 
-        // Inicia o preenchimento
+        // Inicia a animação do coração que cresce
         draw();
 
         window.addEventListener('resize', () => {
             resize();
+            ctx.fillStyle = "red";
             ctx.font = "bold 8px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
